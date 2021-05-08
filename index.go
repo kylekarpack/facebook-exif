@@ -1,40 +1,39 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
-
-	"github.com/Jeffail/gabs"
+	"strings"
 )
+
+var m map[string]string
 
 func main() {
 	fmt.Println("Starting...")
 	getFiles()
-	readFile("test")
 }
 
-func readFile(filename string) {
-	jsonParsed, err := gabs.ParseJSON([]byte(`{
-		"outter":{
-			"inner":{
-				"value1":10,
-				"value2":22
-			},
-			"alsoInner":{
-				"value1":20,
-				"array1":[
-					30, 40
-				]
-			}
-		}
-	}`))
+func readFile(filename string) Album {
+	fmt.Println(filename)
+	content, err := ioutil.ReadFile(filename)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
-	fmt.Print(jsonParsed)
+	var album Album
+	json.Unmarshal([]byte(content), &album)
+
+	return album
+}
+
+func processAlbum(album Album) {
+	for _, photo := range album.Photos {
+		//photo.URI
+	}
 }
 
 func getFiles() {
@@ -43,7 +42,13 @@ func getFiles() {
 			if err != nil {
 				return err
 			}
-			fmt.Println(path, info.Size())
+			if strings.HasSuffix(path, ".json") {
+				album := readFile(path)
+				processAlbum(album)
+
+				fmt.Println(album)
+			}
+
 			return nil
 		})
 	if err != nil {
