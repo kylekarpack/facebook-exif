@@ -8,17 +8,19 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/rwcarlsen/goexif/exif"
 )
 
-var m map[string]string
+var exifMap = make(map[string]Photo)
 
 func main() {
 	fmt.Println("Starting...")
 	getFiles()
+	getPhotos()
 }
 
 func readFile(filename string) Album {
-	fmt.Println(filename)
 	content, err := ioutil.ReadFile(filename)
 	if err != nil {
 		log.Fatal(err)
@@ -32,8 +34,21 @@ func readFile(filename string) Album {
 
 func processAlbum(album Album) {
 	for _, photo := range album.Photos {
-		//photo.URI
+		var parts = strings.Split(photo.URI, "/")
+		var name = parts[len(parts)-1]
+		exifMap[name] = photo
 	}
+}
+
+func processPhoto(path string) {
+	file, err := os.Open(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	exifData, err := exif.Decode(file)
+
+	fmt.Println(exifData)
 }
 
 func getFiles() {
@@ -45,13 +60,25 @@ func getFiles() {
 			if strings.HasSuffix(path, ".json") {
 				album := readFile(path)
 				processAlbum(album)
-
-				fmt.Println(album)
 			}
-
 			return nil
 		})
 	if err != nil {
 		log.Println(err)
 	}
+}
+
+func getPhotos() {
+
+	photos, err := filepath.Glob("./photos_and_videos/**/*.jpg")
+
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	for _, photo := range photos {
+
+	}
+
 }
