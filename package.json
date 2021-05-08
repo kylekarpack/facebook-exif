@@ -1,0 +1,9 @@
+{
+  "name": "facebook-exif",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/kylekarpack/facebook-exif.git",
+  "author": "Kyle Karpack <kylekarpack@gmail.com>",
+  "license": "MIT",
+  "private": false
+}
