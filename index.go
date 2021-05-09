@@ -45,7 +45,7 @@ func fixDates(photos []string, exifMap map[string]Photo) {
 			cmd.Run()
 			fmt.Println("Fixed date for", filename, "to", strDate)
 		} else {
-			log.Fatal("Could not find ", filename)
+			fmt.Println("Could not find ", filename)
 		}
 	}
 }
