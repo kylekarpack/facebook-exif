@@ -7,22 +7,53 @@ import (
 	"log"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
+	"time"
 )
 
 var exifMap = make(map[string]Photo)
 
 func main() {
+	fmt.Println("Starting...")
+	run()
+	fmt.Println("Complete")
+}
+
+func checkExiftool() {
 	// Check for exiftool
 	cmd := exec.Command("exiftool", "-ver")
 	err := cmd.Run()
 	if err != nil {
 		log.Fatal("exiftool is required to run this program. Please install with \"sudo apt-get install exiftool\"")
 	}
+}
 
-	fmt.Println("Starting...")
-	getFiles()
-	getPhotos()
+func run() {
+	exifMap := getFiles()
+	fmt.Print("This many", len(exifMap))
+	photos := getPhotos()
+	fixDates(photos, exifMap)
+}
+
+func fixDates(photos []string, exifMap map[string]Photo) {
+	for _, filepath := range photos {
+		filename := getFilenameFromPath(filepath)
+		if val, ok := exifMap[filename]; ok {
+			i, err := strconv.ParseInt((string)(val.CreationTimestamp), 10, 64)
+			if err != nil {
+				log.Panic(err)
+			}
+			tm := time.Unix(i, 0)
+			fmt.Println(tm)
+			// cmd := exec.Command("exiftool", "-AllDates=2021:05:02 21:36:17-04:00", filepath)
+			// cmd.Run()
+			fmt.Println("Fixed metadata for", filepath, "to", tm)
+		} else {
+			log.Fatal("Could not find ", filename)
+		}
+
+	}
 }
 
 func readFile(filename string) Album {
@@ -36,22 +67,20 @@ func readFile(filename string) Album {
 	return album
 }
 
-func processAlbum(album Album) {
+func processAlbum(album Album, exifMap map[string]Photo) {
 	for _, photo := range album.Photos {
-		var parts = strings.Split(photo.URI, "/")
-		var name = parts[len(parts)-1]
+		name := getFilenameFromPath(photo.URI)
 		exifMap[name] = photo
 	}
 }
 
-func processPhoto(path string) {
-	cmd := exec.Command("exiftool", "-AllDates=2021:05:02 21:36:17-04:00", path)
-	cmd.Run()
-	fmt.Println("Fixed metadata for", path)
-
+func getFilenameFromPath(path string) string {
+	var parts = strings.Split(path, "/")
+	var name = parts[len(parts)-1]
+	return name
 }
 
-func getFiles() {
+func getFiles() map[string]Photo {
 
 	albums, err := filepath.Glob("./photos_and_videos/albums/**/*.json")
 
@@ -59,23 +88,23 @@ func getFiles() {
 		log.Panic(err)
 	}
 
+	var exifMap = make(map[string]Photo)
+
 	for _, path := range albums {
 		album := readFile(path)
-		processAlbum(album)
+		processAlbum(album, exifMap)
 	}
+
+	return exifMap
 }
 
-func getPhotos() {
+func getPhotos() []string {
 
 	photos, err := filepath.Glob("./photos_and_videos/**/*.jpg")
 	if err != nil {
 		log.Panic(err)
 	}
 
-	fmt.Println(photos[0])
-	processPhoto(photos[0])
-	// for _, photo := range photos {
-	// 	processPhoto(photo)
-	// }
+	return photos
 
 }
