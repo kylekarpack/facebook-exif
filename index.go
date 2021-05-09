@@ -5,10 +5,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
-	"time"
 )
 
 var exifMap = make(map[string]Photo)
@@ -24,7 +23,6 @@ func readFile(filename string) Album {
 	if err != nil {
 		log.Panic(err)
 	}
-
 	var album Album
 	json.Unmarshal([]byte(content), &album)
 
@@ -40,32 +38,9 @@ func processAlbum(album Album) {
 }
 
 func processPhoto(path string) {
-	// get last modified time
-	file, err := os.Stat(path)
-
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	modifiedtime := file.ModTime()
-
-	fmt.Println("Last modified time : ", modifiedtime)
-
-	// get current timestamp
-
-	currenttime := time.Now().Local()
-
-	fmt.Println("Current time : ", currenttime.Format("2006-01-02 15:04:05 +0800"))
-
-	// change both atime and mtime to currenttime
-
-	err = os.Chtimes(path, currenttime, currenttime)
-
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	fmt.Println("Changed the file time information")
+	cmd := exec.Command("exiftool", "-AllDates=2021:05:02 21:36:17-04:00", path)
+	cmd.Run()
+	fmt.Println("Fixed metadata for", path)
 
 }
 
@@ -86,10 +61,10 @@ func getFiles() {
 func getPhotos() {
 
 	photos, err := filepath.Glob("./photos_and_videos/**/*.jpg")
-
 	if err != nil {
 		log.Panic(err)
 	}
+
 	fmt.Println(photos[0])
 	processPhoto(photos[0])
 	// for _, photo := range photos {
