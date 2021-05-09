@@ -1,16 +1,16 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
-	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/rwcarlsen/goexif/exif"
-	"github.com/rwcarlsen/goexif/tiff"
+	exif "github.com/dsoprea/go-exif/v3"
+	jpegstructure "github.com/dsoprea/go-jpeg-image-structure/v2"
+	log "github.com/dsoprea/go-logging"
 )
 
 var exifMap = make(map[string]Photo)
@@ -23,9 +23,7 @@ func main() {
 
 func readFile(filename string) Album {
 	content, err := ioutil.ReadFile(filename)
-	if err != nil {
-		log.Fatal(err)
-	}
+	log.PanicIf(err)
 
 	var album Album
 	json.Unmarshal([]byte(content), &album)
@@ -41,32 +39,55 @@ func processAlbum(album Album) {
 	}
 }
 
-type Printer struct{}
-
-func (p Printer) Walk(name exif.FieldName, tag *tiff.Tag) error {
-	fmt.Printf("%40s: %s\n", name, tag)
-	return nil
-}
-
 func processPhoto(path string) {
-	fmt.Println(path)
-	file, err := os.Open("./" + path)
-	if err != nil {
-		fmt.Println("Badfasdfsadf")
-		log.Fatal(err)
+	jmp := jpegstructure.NewJpegMediaParser()
+
+	intfc, err := jmp.ParseFile(path)
+	log.PanicIf(err)
+
+	sl := intfc.(*jpegstructure.SegmentList)
+
+	// Update the CameraOwnerName tag.
+
+	rootIb, err := sl.ConstructExifBuilder()
+	log.PanicIf(err)
+
+	ifdPath := "IFD/Exif"
+
+	ifdIb, err := exif.GetOrCreateIbFromRootIb(rootIb, ifdPath)
+	log.PanicIf(err)
+
+	err = ifdIb.SetStandardWithName("CameraOwnerName", "TestOwner")
+	log.PanicIf(err)
+
+	// Update the exif segment.
+
+	err = sl.SetExif(rootIb)
+	log.PanicIf(err)
+
+	b := new(bytes.Buffer)
+
+	err = sl.Write(b)
+	log.PanicIf(err)
+
+	// Validate.
+
+	d := b.Bytes()
+
+	intfc, err = jmp.ParseBytes(d)
+	log.PanicIf(err)
+
+	sl = intfc.(*jpegstructure.SegmentList)
+
+	_, _, exifTags, err := sl.DumpExif()
+	log.PanicIf(err)
+
+	for _, et := range exifTags {
+		if et.IfdPath == "IFD/Exif" && et.TagName == "CameraOwnerName" {
+			fmt.Printf("Value: [%s]\n", et.FormattedFirst)
+			break
+		}
 	}
-
-	exifData, err := exif.Decode(file)
-
-	if err != nil {
-		fmt.Println("Badfasdfsadf 123123")
-
-		log.Fatal(err)
-	}
-
-	var p Printer
-
-	exifData.Walk(p)
 
 }
 
@@ -74,9 +95,7 @@ func getFiles() {
 
 	albums, err := filepath.Glob("./photos_and_videos/albums/**/*.json")
 
-	if err != nil {
-		log.Fatal(err)
-	}
+	log.PanicIf(err)
 
 	for _, path := range albums {
 		album := readFile(path)
@@ -87,13 +106,12 @@ func getFiles() {
 func getPhotos() {
 
 	photos, err := filepath.Glob("./photos_and_videos/**/*.jpg")
+	log.PanicIf(err)
 
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	for _, photo := range photos {
-		processPhoto(photo)
-	}
+	fmt.Println(photos[0])
+	processPhoto(photos[0])
+	// for _, photo := range photos {
+	// 	processPhoto(photo)
+	// }
 
 }
