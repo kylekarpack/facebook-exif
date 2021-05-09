@@ -13,6 +13,13 @@ import (
 var exifMap = make(map[string]Photo)
 
 func main() {
+	// Check for exiftool
+	cmd := exec.Command("exiftool", "-ver")
+	err := cmd.Run()
+	if err != nil {
+		log.Fatal("exiftool is required to run this program. Please install with \"sudo apt-get install exiftool\"")
+	}
+
 	fmt.Println("Starting...")
 	getFiles()
 	getPhotos()
