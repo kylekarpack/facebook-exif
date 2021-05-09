@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/rwcarlsen/goexif/exif"
+	"github.com/rwcarlsen/goexif/tiff"
 )
 
 var exifMap = make(map[string]Photo)
@@ -40,31 +41,46 @@ func processAlbum(album Album) {
 	}
 }
 
+type Printer struct{}
+
+func (p Printer) Walk(name exif.FieldName, tag *tiff.Tag) error {
+	fmt.Printf("%40s: %s\n", name, tag)
+	return nil
+}
+
 func processPhoto(path string) {
-	file, err := os.Open(path)
+	fmt.Println(path)
+	file, err := os.Open("./" + path)
 	if err != nil {
+		fmt.Println("Badfasdfsadf")
 		log.Fatal(err)
 	}
 
 	exifData, err := exif.Decode(file)
 
-	fmt.Println(exifData)
+	if err != nil {
+		fmt.Println("Badfasdfsadf 123123")
+
+		log.Fatal(err)
+	}
+
+	var p Printer
+
+	exifData.Walk(p)
+
 }
 
 func getFiles() {
-	err := filepath.Walk("./photos_and_videos/album",
-		func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
-			if strings.HasSuffix(path, ".json") {
-				album := readFile(path)
-				processAlbum(album)
-			}
-			return nil
-		})
+
+	albums, err := filepath.Glob("./photos_and_videos/albums/**/*.json")
+
 	if err != nil {
-		log.Println(err)
+		log.Fatal(err)
+	}
+
+	for _, path := range albums {
+		album := readFile(path)
+		processAlbum(album)
 	}
 }
 
@@ -73,12 +89,11 @@ func getPhotos() {
 	photos, err := filepath.Glob("./photos_and_videos/**/*.jpg")
 
 	if err != nil {
-		log.Println(err)
-		return
+		log.Fatal(err)
 	}
 
 	for _, photo := range photos {
-
+		processPhoto(photo)
 	}
 
 }
