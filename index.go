@@ -15,7 +15,9 @@ var exifMap = make(map[string]Photo)
 
 func main() {
 	fmt.Println("Starting...")
-	run()
+	exifMap := getFiles()
+	photos := getPhotos()
+	fixDates(photos, exifMap)
 	fmt.Println("Complete")
 }
 
@@ -26,13 +28,6 @@ func checkExiftool() {
 	if err != nil {
 		log.Fatal("exiftool is required to run this program. Please install with \"sudo apt-get install exiftool\"")
 	}
-}
-
-func run() {
-	exifMap := getFiles()
-	fmt.Print("This many", len(exifMap))
-	photos := getPhotos()
-	fixDates(photos, exifMap)
 }
 
 func fixDates(photos []string, exifMap map[string]Photo) {
