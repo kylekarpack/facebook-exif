@@ -14,17 +14,15 @@ import (
 )
 
 // Set a given tag value on an exif object
-func setExifTag(rootIB *exif.IfdBuilder, ifdPath, tagName, tagValue string) error {
+func setExifTag(rootIB *exif.IfdBuilder, ifdPath, tagName, tagValue string) {
 	ifdIb, err := exif.GetOrCreateIbFromRootIb(rootIB, ifdPath)
 	if err != nil {
-		return fmt.Errorf("Failed to get or create IB: %v", err)
+		log.Panicf("Failed to get or create IB: %v", err)
 	}
 
 	if err := ifdIb.SetStandardWithName(tagName, tagValue); err != nil {
-		return fmt.Errorf("failed to set DateTime tag: %v", err)
+		log.Panicf("failed to set %v tag to %v: %v", tagName, tagValue, err)
 	}
-
-	return nil
 }
 
 func getMediaContext(filepath string) riimage.MediaContext {
@@ -61,19 +59,11 @@ func setPhotoDate(filepath string, t time.Time) {
 	}
 
 	// Form our timestamp string
-	ts := exifcommon.ExifFullTimestampString(t)
+	timestamp := exifcommon.ExifFullTimestampString(t)
 
-	// Set DateTime
 	ifdPath := "IFD0"
-	if err := setExifTag(rootIb, ifdPath, "DateTime", ts); err != nil {
-		log.Panicf("Failed to set tag %v: %v", "DateTime", err)
-	}
-
-	// Set DateTimeOriginal
-	ifdPath = "IFD/Exif"
-	if err := setExifTag(rootIb, ifdPath, "DateTimeOriginal", ts); err != nil {
-		log.Panicf("Failed to set tag %v: %v", "DateTimeOriginal", err)
-	}
+	setExifTag(rootIb, ifdPath, "DateTime", timestamp)         // Set DateTime
+	setExifTag(rootIb, ifdPath, "DateTimeOriginal", timestamp) // Set DateTimeOriginal
 
 	// Update the exif segment.
 	if err := segmentList.SetExif(rootIb); err != nil {
