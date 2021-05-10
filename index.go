@@ -10,8 +10,6 @@ import (
 	"time"
 )
 
-var exifMap = make(map[string]Photo)
-
 func main() {
 	fmt.Println("Starting...")
 	exifMap := getFiles()
@@ -28,7 +26,7 @@ func fixDates(photos []string, exifMap map[string]Photo) {
 			setPhotoDate(filepath, t)
 			fmt.Printf("(%v of %v) Fixed date for %v to %v\n", i, len(photos), filename, t.Format(time.RFC3339))
 		} else {
-			fmt.Println("Could not find ", filename)
+			fmt.Printf("Could not find file: %v\n", filename)
 		}
 	}
 }
