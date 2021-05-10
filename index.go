@@ -36,12 +36,12 @@ func checkExiftool() {
 }
 
 func fixDates(photos []string, exifMap map[string]Photo) {
-	for _, filepath := range photos[0:10] {
+	for i, filepath := range photos {
 		filename := getFilenameFromPath(filepath)
 		if val, ok := exifMap[filename]; ok {
 			t := time.Unix(int64(val.CreationTimestamp), 0)
 			setPhotoDate(filepath, t)
-			fmt.Println("Fixed date for", filename, "to", t.Format(time.RFC3339))
+			fmt.Printf("(%v of %v) Fixed date for %v to %v\n", i, len(photos), filename, t.Format(time.RFC3339))
 		} else {
 			fmt.Println("Could not find ", filename)
 		}
