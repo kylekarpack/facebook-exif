@@ -1,3 +1,5 @@
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=kylekarpack_fix-fb-meta&metric=bugs)](https://sonarcloud.io/dashboard?id=kylekarpack_fix-fb-meta) [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=kylekarpack_fix-fb-meta&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=kylekarpack_fix-fb-meta)
+
 # fix-fb-meta
 
 This is utility for adding back missing metadata from Facebook photo downloads. It works by retrieving metadata from the JSON files Facebook provides and writing it back to the photos from which it was stripped.
