@@ -1,4 +1,4 @@
-# facebook-exif
+# fix-fb-meta
 
 This is a small utility for adding back missing metadata from Facebook photo downloads. It works by retrieving metadata from the JSON files Facebook provides and writing it back the photos from which it was stripped.
 

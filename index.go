@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func main() {
+func run() {
 	fmt.Println("Starting...")
 	exifMap := getFiles()
 	photos := getPhotos()
