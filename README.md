@@ -8,15 +8,16 @@ At the moment, it primarily adds back the created date for each photo, which is 
 
 ## Usage
 
-1. To start, [download your photos](https://www.facebook.com/dyi/) from Facebook. After extracting the photos, target 
-2. From the `bin/` folder, download the executable matching your operating system and architecture:
+1. Download the utility. From the `bin/` folder, download the executable matching your operating system and architecture:
    - [Windows x86](bin/win-x86/fix-fb-meta.exe)
    - [Windows x64](bin/win-x64/fix-fb-meta.exe)
    - [MacOS AMD x64](bin/darwin-amd64/fix-fb-meta)
    - [MacOS ARM x64](bin/darwin-arm64/fix-fb-meta)
    - [Linux AMD x64](bin/linux-amd64/fix-fb-meta)
    - If you need another version, please open an issue or feel free to compile your own!
-3. Run the CLI per instructions below
+2. To start, [download your photos](https://www.facebook.com/dyi/) from Facebook.
+3. Extract the downloaded archive. Note the `photos_and_videos` directory - you'll need to target this later
+4. Run the CLI per instructions below
 
 Example usage:
 ```
