@@ -5,17 +5,17 @@ import (
 	"time"
 )
 
+// Run the CLI application
 func run(dir string, dryRun bool) {
-	start := time.Now()
+	defer duration(track("Completed in"))
 	fmt.Println("Starting...")
-	exifMap := getFiles(dir)
+	metadataMap := getMetadata(dir)
 	photos := getPhotos(dir)
 	if dryRun {
-		logInfo(photos, exifMap)
+		logInfo(photos, metadataMap)
 	} else {
-		fixDates(photos, exifMap)
+		fixDates(photos, metadataMap)
 	}
-	fmt.Printf("Complete in %v\n", time.Since(start))
 }
 
 // Dry run: log info without modifying files
