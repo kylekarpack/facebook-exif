@@ -30,7 +30,7 @@ Usage:
    fix-fb-meta <command> {flags}
 
 Commands: 
-   help                          displays usage informationn
+   help                          displays usage information
    info                          perform a 'dry run' and return info without modifying files
    version                       displays version number
 
