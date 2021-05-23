@@ -14,7 +14,7 @@ import (
 func readFile(filename string) Album {
 	content, err := ioutil.ReadFile(filename)
 	if err != nil {
-		log.Panic(err)
+		log.Fatal(err)
 	}
 	var album Album
 	json.Unmarshal([]byte(content), &album)
@@ -34,7 +34,11 @@ func getMetadata(dir string) map[string]Photo {
 	albums, err := filepath.Glob(path.Join(dir, "/album/*.json"))
 
 	if err != nil {
-		log.Panic(err)
+		log.Fatal(err)
+	}
+
+	if len(albums) == 0 {
+		log.Fatalf("No metadata found in directory %v\n", dir)
 	}
 
 	metadataMap := make(map[string]Photo)
@@ -54,7 +58,11 @@ func getPhotos(dir string) []string {
 
 	photos, err := filepath.Glob(path.Join(dir, "/**/*.jpg"))
 	if err != nil {
-		log.Panic(err)
+		log.Fatal(err)
+	}
+
+	if len(photos) == 0 {
+		log.Fatalf("No photos found in directory %v\n", dir)
 	}
 
 	return photos

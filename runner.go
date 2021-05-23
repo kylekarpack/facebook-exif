@@ -19,15 +19,16 @@ func run(dir string, dryRun bool) {
 }
 
 // Dry run: log info without modifying files
-func logInfo(photos []string, exifMap map[string]Photo) {
+func logInfo(photos []string, metadataMap map[string]Photo) {
 	fmt.Printf("%v photos found\n", len(photos))
+	fmt.Printf("%v metadata entries found\n", len(metadataMap))
 }
 
 // Full run: modify photo metadata
-func fixDates(photos []string, exifMap map[string]Photo) {
+func fixDates(photos []string, metadataMap map[string]Photo) {
 	for i, filepath := range photos {
 		filename := getFilenameFromPath(filepath)
-		if val, ok := exifMap[filename]; ok {
+		if val, ok := metadataMap[filename]; ok {
 			t := time.Unix(int64(val.CreationTimestamp), 0)
 			setPhotoDate(filepath, t)
 			fmt.Printf("(%v of %v) Fixed date for %v to %v\n", i, len(photos), filename, t.Format(time.RFC3339))

@@ -24,8 +24,8 @@ func main() {
 	// configure info command
 	commando.
 		Register("info").
-		SetShortDescription("displays detailed information of a directory").
-		SetDescription("This command displays more information about the contents of the directory like size, permission and ownership, etc.").
+		SetShortDescription("perform a 'dry run' and return info without modifying files").
+		SetDescription("This command displays more information about the contents of the directory like number of photos and metadata found").
 		AddArgument("dir", "directory to photos", "./photos_and_videos"). // default `./photos_and_videos`
 		SetAction(func(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
 			dir := args["dir"].Value
