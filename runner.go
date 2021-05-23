@@ -5,26 +5,31 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"path"
 	"path/filepath"
 	"strings"
 	"time"
 )
 
-func run() {
+func run(dir string, dryRun bool) {
 	fmt.Println("Starting...")
-	exifMap := getFiles()
-	photos := getPhotos()
-	fixDates(photos, exifMap)
+	exifMap := getFiles(dir)
+	photos := getPhotos(dir)
+	if dryRun {
+
+	} else {
+		fixDates(photos, exifMap)
+	}
 	fmt.Println("Complete")
 }
 
 func fixDates(photos []string, exifMap map[string]Photo) {
-	for _, filepath := range photos {
+	for i, filepath := range photos {
 		filename := getFilenameFromPath(filepath)
 		if val, ok := exifMap[filename]; ok {
 			t := time.Unix(int64(val.CreationTimestamp), 0)
 			setPhotoDate(filepath, t)
-			//fmt.Printf("(%v of %v) Fixed date for %v to %v\n", i, len(photos), filename, t.Format(time.RFC3339))
+			fmt.Printf("(%v of %v) Fixed date for %v to %v\n", i, len(photos), filename, t.Format(time.RFC3339))
 		} else {
 			fmt.Printf("Could not find file: %v\n", filename)
 		}
@@ -47,9 +52,9 @@ func getFilenameFromPath(path string) string {
 	return parts[len(parts)-1]
 }
 
-func getFiles() map[string]Photo {
+func getFiles(dir string) map[string]Photo {
 
-	albums, err := filepath.Glob("./photos_and_videos/album/*.json")
+	albums, err := filepath.Glob(path.Join(dir, "/album/*.json"))
 
 	if err != nil {
 		log.Panic(err)
@@ -67,13 +72,12 @@ func getFiles() map[string]Photo {
 	return exifMap
 }
 
-func getPhotos() []string {
+func getPhotos(dir string) []string {
 
-	photos, err := filepath.Glob("./photos_and_videos/**/*.jpg")
+	photos, err := filepath.Glob(path.Join(dir, "/**/*.jpg"))
 	if err != nil {
 		log.Panic(err)
 	}
 
 	return photos
-
 }

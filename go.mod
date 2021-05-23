@@ -1,4 +1,4 @@
-module facebook-exif
+module fix-fb-exif
 
 go 1.16
 
