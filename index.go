@@ -19,12 +19,12 @@ func main() {
 }
 
 func fixDates(photos []string, exifMap map[string]Photo) {
-	for i, filepath := range photos {
+	for _, filepath := range photos {
 		filename := getFilenameFromPath(filepath)
 		if val, ok := exifMap[filename]; ok {
 			t := time.Unix(int64(val.CreationTimestamp), 0)
 			setPhotoDate(filepath, t)
-			fmt.Printf("(%v of %v) Fixed date for %v to %v\n", i, len(photos), filename, t.Format(time.RFC3339))
+			//fmt.Printf("(%v of %v) Fixed date for %v to %v\n", i, len(photos), filename, t.Format(time.RFC3339))
 		} else {
 			fmt.Printf("Could not find file: %v\n", filename)
 		}
