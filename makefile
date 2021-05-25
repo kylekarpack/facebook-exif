@@ -7,4 +7,4 @@ compile:
 	GOOS=windows GOARCH=amd64 go build -o bin/win-x64/fix-fb-meta.exe *.go
 
 run:
-	go run *.go
+	go run .
